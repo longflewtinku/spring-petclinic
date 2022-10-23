@@ -15,7 +15,7 @@ def call() {
         }
         stage('Junit Results'){
             steps {
-                Junits '**/surefire-reports/*.xml'
+                Junits  **/surefire-reports/*.xml
             }
         }
       }
