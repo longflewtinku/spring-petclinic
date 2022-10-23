@@ -4,8 +4,8 @@ def call() {
     stages {
         stage('vcs') {
             steps {
-                git url: 'https://github.com/longflewtinku/spring-petclinic.git' , 
-                    branch 'main'
+                git url: 'https://github.com/longflewtinku/spring-petclinic.git', 
+                    branch: 'main'
             }
         }    
         stage('Example Build') {
