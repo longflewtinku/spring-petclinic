@@ -1,8 +1,8 @@
 def call() {
     pipeline {
-    agent { label 'OPENJDK-JDK' }
+    agent { label 'OPENJDK-11-JDK' }
     stages {
-        stage('learning') {
+        stage('vcs') {
             steps {
                 git url: 'https://github.com/longflewtinku/spring-petclinic.git' , 
                     branch 'main'
