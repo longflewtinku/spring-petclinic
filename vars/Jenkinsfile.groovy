@@ -4,7 +4,7 @@ def call() {
     stages {
         stage('learning') {
             steps {
-                git url: 'https://github.com/spring-projects/spring-petclinic.git' , 
+                git url: 'https://github.com/longflewtinku/spring-petclinic.git' , 
                     branch 'main'
             }
         }    
