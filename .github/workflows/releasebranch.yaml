@@ -1,21 +1,28 @@
 name: Deployment
+
 on:
   push:
-    branches: release
+    branches:
+      - release
   pull_request:
-    branches: main
+    branches:
+      - main
 
 jobs:
   deployment:
     name: Build
     runs-on: ubuntu-20.04
+
     steps:
-       - name: Log in to Docker Hub
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: vijaysiri048@gmail.com
-          password: Cloud@9456
-          
+           username: vijaysiri048@gmail.com
+           password: Cloud@9456
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
