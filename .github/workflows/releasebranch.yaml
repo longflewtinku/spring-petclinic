@@ -93,4 +93,4 @@ jobs:
 
       - name: Deploy using Helm
         run: |
-          helm upgrade --install $HELM_APP_NAME spc-chart --namespace default --create-namespace
+          helm upgrade --install "$HELM_APP_NAME" ./spc-chart --namespace default --create-namespace
