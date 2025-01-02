@@ -66,3 +66,31 @@ jobs:
       - name: Install Helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Create Helm Chart
+        run: |
+          helm create spc-chart
+          cat <<EOF > spc-chart/values.yaml
+          replicaCount: 2
+
+          image:
+            repository: vijaykumar100/my-app
+            tag: "3.0"
+            pullPolicy: IfNotPresent
+
+          service:
+            type: LoadBalancer
+            port: 80
+
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          EOF
+
+      - name: Deploy using Helm
+        run: |
+          helm upgrade --install $HELM_APP_NAME spc-chart --namespace default --create-namespace
