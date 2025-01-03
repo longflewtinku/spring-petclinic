@@ -100,6 +100,9 @@ jobs:
           kubectl get all
           kubectl logs pod/my-app-release-spc-chart-69fdb44ddb-m88fx
           kubectl logs pod/my-app-release-spc-chart-69fdb44ddb-x869p
+          kubectl get service my-app-release-spc-chart -o yaml
+          kubectl run -it --rm --image=busybox debug -- sh
+          wget -qO- http://my-app-release-spc-chart:8000
 
       # - name: Set Release Name and Deploy using Helm
       #   run: |
