@@ -22,7 +22,8 @@ ingress:
   enabled: true
 
 serviceAccount:
-  create: true
+  create: true  
+  name: my-service-account  
 
 autoscaling:
   enabled: true  
