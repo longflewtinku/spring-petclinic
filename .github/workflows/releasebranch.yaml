@@ -55,10 +55,14 @@ jobs:
             export REGION="eastus"
             export MY_AKS_CLUSTER_NAME="myAKSCluster"
             export MY_DNS_LABEL="mydnslabel"
-            az group create --name $MY_RESOURCE_GROUP_NAME --location $REGION
-            az aks create --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --node-count 2 --node-vm-size "Standard_B2ms" --generate-ssh-keys
-            az aks install-cli 
-
+            if az aks show --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --query id -o tsv; then
+              echo "AKS Cluster $MY_AKS_CLUSTER_NAME already exists."
+            else
+              echo "Creating AKS Cluster $MY_AKS_CLUSTER_NAME..."
+              az group create --name $MY_RESOURCE_GROUP_NAME --location $REGION
+              az aks create --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --node-count 2 --node-vm-size "Standard_B2ms" --generate-ssh-keys
+              az aks install-cli
+            fi
       - name: Set AKS context
         run: |
           az aks get-credentials --resource-group myAKSResourceGroup --name myAKSCluster
