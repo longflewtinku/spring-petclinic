@@ -87,12 +87,12 @@ jobs:
             port: 8080
 
           resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
           EOF
       - name: Get all K8s 
         run: |
