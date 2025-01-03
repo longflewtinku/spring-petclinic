@@ -96,7 +96,6 @@ jobs:
           EOF
       - name: Get all K8s 
         run: |
-          kubectl get nodes
           kubectl get all
          
 
