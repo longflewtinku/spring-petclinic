@@ -63,6 +63,7 @@ jobs:
               az aks create --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --node-count 2 --node-vm-size "Standard_B2ms" --generate-ssh-keys
               az aks install-cli
             fi
+            
       - name: Set AKS context
         run: |
           az aks get-credentials --resource-group myAKSResourceGroup --name myAKSCluster
@@ -94,27 +95,18 @@ jobs:
               memory: "256Mi"
               cpu: "512m"
           EOF
-      - name: Get all K8s 
+
+      - name: Get all K8s resources 
         run: |
           kubectl get all
 
       - name: Deploy Helm Chart
-      run: |
-        helm upgrade --install my-app-release ./spc-chart \
-          --namespace default \
-          --set image.tag=${{ github.sha }} \
-          --set service.type=LoadBalancer
-          --set serviceAccount.create=true \
-          --set ingress.enabled=false \
-          --set autoscaling.enabled=false
-         
-      # - name: Set Release Name and Deploy using Helm
-      #   run: |
-      #    helm upgrade --install my-app-release ./spc-chart \
-      #         --namespace default \
-      #         --create-namespace \
-      #         --set serviceAccount.create=true \
-      #         --set ingress.enabled=false \
-      #         --set autoscaling.enabled=false
-
+        run: |
+          helm upgrade --install my-app-release ./spc-chart \
+            --namespace default \
+            --set image.tag=${{ github.sha }} \
+            --set serviceAccount.create=true \
+            --set ingress.enabled=false \
+            --set autoscaling.enabled=false \
+            --set service.type=LoadBalancer
 
