@@ -84,7 +84,7 @@ jobs:
 
           service:
             type: LoadBalancer
-            port: 80
+            port: 8080
 
           resources:
             limits:
