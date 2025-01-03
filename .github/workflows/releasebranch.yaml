@@ -97,4 +97,5 @@ jobs:
 
       - name: Set Release Name and Deploy using Helm
         run: |
+          HELM_APP_NAME="my-app-release"  
           helm upgrade --install "$HELM_APP_NAME" ./spc-chart --namespace default --create-namespace
