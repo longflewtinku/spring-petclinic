@@ -88,11 +88,11 @@ jobs:
 
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "128Mi"
+              cpu: "256m"
             limits:
-              memory: "1024Mi"
-              cpu: "1024m"
+              memory: "256Mi"
+              cpu: "512m"
           EOF
       - name: Get all K8s 
         run: |
