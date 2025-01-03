@@ -95,6 +95,9 @@ jobs:
               memory: 128Mi
           EOF
 
-      - name: Deploy using Helm
+      - name: Set Release Name and Deploy using Helm
+        env:
+            HELM_APP_NAME: "my-app"  
         run: |
+          echo "Deploying with release name '$HELM_APP_NAME'"
           helm upgrade --install "$HELM_APP_NAME" ./spc-chart --namespace default --create-namespace
