@@ -100,4 +100,5 @@ jobs:
          helm upgrade --install my-app-release ./spc-chart \
               --namespace default \
               --create-namespace \
-              --set serviceAccount.create=true
+              --set serviceAccount.create=true \
+              --set ingress.enabled=false
