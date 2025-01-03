@@ -18,15 +18,4 @@ resources:
     memory: "256Mi"
     cpu: "1000m"
 
-ingress:
-  enabled: true
 
-serviceAccount:
-  create: true  
-  name: my-service-account  
-
-autoscaling:
-  enabled: true  
-  minReplicas: 1
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 80
