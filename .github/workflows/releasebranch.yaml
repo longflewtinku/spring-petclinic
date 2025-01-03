@@ -101,4 +101,5 @@ jobs:
               --namespace default \
               --create-namespace \
               --set serviceAccount.create=true \
-              --set ingress.enabled=false
+              --set ingress.enabled=false \
+              --set autoscaling.enabled=false
