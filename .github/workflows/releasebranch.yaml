@@ -91,8 +91,8 @@ jobs:
               memory: "256Mi"
               cpu: "500m"
             limits:
-              memory: "512Mi"
-              cpu: "1000m"
+              memory: "1024Mi"
+              cpu: "1024m"
           EOF
       - name: Get all K8s 
         run: |
