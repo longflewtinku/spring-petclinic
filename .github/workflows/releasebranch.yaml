@@ -101,6 +101,7 @@ jobs:
           kubectl logs pod/my-app-release-spc-chart-69fdb44ddb-m88fx
           kubectl logs pod/my-app-release-spc-chart-69fdb44ddb-x869p
           kubectl get service my-app-release-spc-chart -o yaml
+          
 
 
       # - name: Set Release Name and Deploy using Helm
