@@ -106,7 +106,7 @@ jobs:
             --namespace default \
             --set image.tag="3.0" \
             --set serviceAccount.create=true \
-            --set ingress.enabled=false \
+            --set ingress.enabled=true \
             --set autoscaling.enabled=false \
             --set service.type=LoadBalancer
 
