@@ -1,0 +1,113 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - release
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deployment:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: vijaysiri048@gmail.com  
+          password: Cloud@9456                
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'docker.io/vijaykumar100/my-app:3.0'
+
+      - name: Check Trivy results
+        run: cat trivy-results.txt
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: '{
+            "clientId": "ed3ba4b5-0f72-44f3-9678-f0bded742997",
+            "clientSecret": ".vY8Q~tC5uPY-NhcyudQy3dYUAbc.NkirnBzodh_",
+            "subscriptionId": "2ceec788-1d7a-46d9-bfed-fef8b160fe28",
+            "tenantId": "78e26bb1-06bc-4872-9e76-312c713f587e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"}'
+            
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            export MY_RESOURCE_GROUP_NAME="myAKSResourceGroup"
+            export REGION="eastus"
+            export MY_AKS_CLUSTER_NAME="myAKSCluster"
+            export MY_DNS_LABEL="mydnslabel"
+            if az aks show --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --query id -o tsv; then
+              echo "AKS Cluster $MY_AKS_CLUSTER_NAME already exists."
+            else
+              echo "Creating AKS Cluster $MY_AKS_CLUSTER_NAME..."
+              az group create --name $MY_RESOURCE_GROUP_NAME --location $REGION
+              az aks create --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME --node-count 2 --node-vm-size "Standard_B2ms" --generate-ssh-keys
+              az aks install-cli
+            fi
+            
+      - name: Set AKS context
+        run: |
+          az aks get-credentials --resource-group myAKSResourceGroup --name myAKSCluster
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Create Helm Chart
+        run: |
+          helm create spc-chart
+          cat <<EOF > spc-chart/values.yaml
+          replicaCount: 3
+
+          image:
+            repository: vijaykumar100/my-app
+            tag: "3.0"
+            pullPolicy: IfNotPresent
+
+          service:
+            type: LoadBalancer
+            port: 8080
+            targetPort: 8080
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "256m"
+            limits:
+              memory: "256Mi"
+              cpu: "512m"
+          EOF
+
+      - name: Get all K8s resources 
+        run: |
+          kubectl get all
+
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install my-app-release ./spc-chart \
+            --namespace default \
+            --set image.tag="3.0" \
+            --set serviceAccount.create=true \
+            --set ingress.enabled=false \
+            --set autoscaling.enabled=false \
+            --set service.type=LoadBalancer
+
