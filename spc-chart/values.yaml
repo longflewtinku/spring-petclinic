@@ -5,10 +5,13 @@ image:
   tag: "3.0"
   pullPolicy: IfNotPresent
 
-service:
-  type: LoadBalancer
-  port: 8080
-  targetPort: 8080
+ingress:
+  enabled: true
+  defaultBackend:
+    service:
+      name: my-service
+      port:
+        number: 80
 
 resources:
   requests:
