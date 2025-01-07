@@ -104,6 +104,7 @@ jobs:
         run: |
           helm upgrade --install my-app-release ./spc-chart \
             --namespace default \
+            --set image.tag="3.0" \
             --set serviceAccount.create=true \
             --set ingress.enabled=false \
             --set autoscaling.enabled=false \
