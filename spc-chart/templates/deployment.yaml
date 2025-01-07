@@ -15,9 +15,6 @@ spec:
       containers:
       - name: spcimage
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }} 
-        ports:
-        - name: http 
         resources:
           requests:
             memory: {{ .Values.resources.requests.memory }}
@@ -25,5 +22,5 @@ spec:
           limits:
             memory: {{ .Values.resources.limits.memory }}
             cpu: {{ .Values.resources.limits.cpu }}
-
-
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
