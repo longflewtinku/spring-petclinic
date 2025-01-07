@@ -83,9 +83,13 @@ jobs:
             tag: "3.0"
             pullPolicy: IfNotPresent
 
-          service:
-            type: LoadBalancer
-            port: 8000
+          ingress:
+          enabled: true
+          defaultBackend:
+            service:
+              name: my-service
+              port:
+                number: 80
 
           resources:
             requests:
