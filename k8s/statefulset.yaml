@@ -1,58 +1,10 @@
-# postgres-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysecret
-  namespace: dev
-type: Opaque
-data:
-  POSTGRES_USER: bXl1c2Vy # base64 encoded 'myuser'
-  POSTGRES_PASSWORD: bXlwYXNzd29yZA== # base64 encoded 'mypassword'
 ---
-# postgres-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-config
-  namespace: dev
-data:
-  POSTGRES_DB: myapp
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgres-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath: # Only for dev/test or on-prem; not recommended for production
-    path: /mnt/data/postgres
-
----
-# postgres-service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-svc
-  namespace: dev
-spec:
-  ports:
-  - port: 5432
-    name: postgres
-  clusterIP: None
-  selector:
-    app: postgres
----
-# postgres-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: dev
 spec:
-  serviceName: postgres-svc
+  serviceName: "postgres"
   replicas: 1
   selector:
     matchLabels:
@@ -63,25 +15,52 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:16
-        envFrom:
-          - configMapRef:
-              name: postgres-config
-          - secretRef:
-              name: mysecret
-        ports:
-          - containerPort: 5432
-            name: postgres
-        volumeMounts:
-          - name: data
-            mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: mydb
+            - name: POSTGRES_USER
+              value: myuser
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
   volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: gp2
-      resources:
-        requests:
-          storage: 1Gi
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      name: postgres
+---      
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+data:
+  username: bXl1c2Vy          # base64 of 'myuser'
+  password: cG9zdGdyZXNwYXNz  # base64 of 'postgrespass'
+
