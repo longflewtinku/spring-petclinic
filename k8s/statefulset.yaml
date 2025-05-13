@@ -18,6 +18,19 @@ metadata:
 data:
   POSTGRES_DB: myapp
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath: # Only for dev/test or on-prem; not recommended for production
+    path: /mnt/data/postgres
+
+---
 # postgres-service.yaml
 apiVersion: v1
 kind: Service
