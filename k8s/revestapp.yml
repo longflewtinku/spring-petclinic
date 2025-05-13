@@ -23,38 +23,38 @@ spec:
         app: revest
     spec:
       containers:
-        - name: revest-container
+        - name: revest
           image: 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
           ports:
             - containerPort: 8080
-      imagePullSecrets:
-        - name: ecr-creds      
           env:
-            - name: POSTGRES_DB
+            - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
                   name: app-config
-                  key: POSTGRES_DB
-            - name: POSTGRES_HOST
+                  key: DB_HOST
+            - name: DB_PORT
               valueFrom:
                 configMapKeyRef:
                   name: app-config
-                  key: POSTGRES_HOST
-            - name: POSTGRES_PORT
+                  key: DB_PORT
+            - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
                   name: app-config
-                  key: POSTGRES_PORT
-            - name: POSTGRES_USER
+                  key: DB_NAME
+            - name: DB_USER
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: username
-            - name: POSTGRES_PASSWORD
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
+      imagePullSecrets:
+        - name: ecr-creds
 ---
 apiVersion: v1
 kind: Service
