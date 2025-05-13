@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-db-service
+spec:
+  clusterIP: None  # This makes it a headless service
+  selector:
+    app: postgresql-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -19,11 +31,9 @@ spec:
           volumeMounts:
             - name: postgresql-db-disk
               mountPath: /data
-          # Config from ConfigMap
           envFrom:
             - configMapRef:
                 name: postgres-db-config
-  # Volume Claim
   volumeClaimTemplates:
     - metadata:
         name: postgresql-db-disk
@@ -32,16 +42,3 @@ spec:
         resources:
           requests:
             storage: 25Gi
----
-# PostgreSQL StatefulSet Service
-apiVersion: v1
-kind: Service
-metadata:
-name: postgres-db-lb
-spec:
-selector:
-app: postgresql-db
-type: LoadBalancer
-ports:
-- port: 5432
-targetPort: 5432
