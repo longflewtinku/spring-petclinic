@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: revest-container
-          image: 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
+          image: shaikkhajaibrahim/libbookssvc:1.0
           ports:
             - containerPort: 8080
           env:
