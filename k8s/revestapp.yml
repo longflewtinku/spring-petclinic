@@ -4,9 +4,11 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  POSTGRES_DB: mydb
-  POSTGRES_HOST: postgres.default.svc.cluster.local
-  POSTGRES_PORT: "5432"
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_NAME: revest
+ 
+
 ---
 apiVersion: apps/v1
 kind: Deployment
