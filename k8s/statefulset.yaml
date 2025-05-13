@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  minReadySeconds: 20
+  replicas: 2
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres-svc
+  volumeClaimTemplates:
+    - metadata:
+        name: db-vol
+      spec:
+        accessModes: 
+          - "ReadWriteOnce"
+        resources:  
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        envFrom:
+          - secretRef:
+              name: mysecret
+        volumeMounts:
+          - name: db-vol 
+            mountPath: /var/lib/postgres/data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+spec:
+  clusterIP: None 
+  selector:
+    app: postgres 
+  ports:
+    - port: 5432
+      targetPort: 5432
