@@ -11,4 +11,12 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage  # Add this line
   local:
-    path: /mnt/disks/ssd1 
+    path: /mnt/disks/ssd1  # Example, adjust to your actual path
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ip-172-31-32-54 
