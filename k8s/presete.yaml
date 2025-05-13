@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage  # Add this line
   local:
-    path: /mnt/disks/ssd1  # Example, adjust to your actual path
+    path:  /boot/efi  # Example, adjust to your actual path
   nodeAffinity:
     required:
       nodeSelectorTerms:
