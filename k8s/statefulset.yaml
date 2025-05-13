@@ -1,58 +1,46 @@
----
-kind: PersistentVolumeClaim
+# postgres-secret.yaml
 apiVersion: v1
+kind: Secret
 metadata:
-  name: postgres-pv-claim
-  labels:
-    app: postgres
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 5Gi
+  name: mysecret
+  namespace: dev
+type: Opaque
+data:
+  POSTGRES_USER: bXl1c2Vy # base64 encoded 'myuser'
+  POSTGRES_PASSWORD: bXlwYXNzd29yZA== # base64 encoded 'mypassword'
 ---
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: postgres-pv-volume
-  labels:
-    type: local
-    app: postgres
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/mnt/data"
----
+# postgres-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-config
-  labels:
-    app: postgres
+  namespace: dev
 data:
-  POSTGRES_DB: postgresdb
-  POSTGRES_USER: admin
+  POSTGRES_DB: myapp
 ---
+# postgres-service.yaml
 apiVersion: v1
-kind: Secret
+kind: Service
 metadata:
-  name: postgres-secret
-data:
-  POSTGRES_PASSWORD: YWRtaW4=  # base64 for 'admin'
+  name: postgres-svc
+  namespace: dev
+spec:
+  ports:
+  - port: 5432
+    name: postgres
+  clusterIP: None
+  selector:
+    app: postgres
 ---
+# postgres-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
+  namespace: dev
 spec:
-  serviceName: postgres
-  replicas: 3
+  serviceName: postgres-svc
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -62,36 +50,24 @@ spec:
         app: postgres
     spec:
       containers:
-        - name: postgres
-          image: postgres:10.1
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 5432
-          envFrom:
-            - configMapRef:
-                name: postgres-config
-          env:
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgredb
-      volumes:
-        - name: postgredb
-          persistentVolumeClaim:
-            claimName: postgres-pv-claim
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-spec:
-  selector:
-    app: postgres
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432
+      - name: postgres
+        image: postgres:16
+        envFrom:
+          - configMapRef:
+              name: postgres-config
+          - secretRef:
+              name: mysecret
+        ports:
+          - containerPort: 5432
+            name: postgres
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi

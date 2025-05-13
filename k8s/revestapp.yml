@@ -1,3 +1,4 @@
+# revest-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,34 +46,29 @@ spec:
                   name: mysecret
                   key: POSTGRES_PASSWORD
           startupProbe:
-            exec:
-              command: [ "pwd" ]
+            httpGet:
+              path: /health # Adjust if your app has a different health endpoint
+              port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 2
           livenessProbe:
             tcpSocket:
-              port: 80
+              port: 8080 # Fixed from 80
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 2
           readinessProbe:
             tcpSocket:
-              port: 80
+              port: 8080 # Fixed from 80
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 2
-          volumeMounts:
-            - name: secrets-store-inline
-              mountPath: "/mnt/secrets"
-              readOnly: true
-      volumes:
-        - name: secrets-store-inline
-          emptyDir: {}
 ---
+# revest-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -84,4 +80,4 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 8080          
+      targetPort: 8080
