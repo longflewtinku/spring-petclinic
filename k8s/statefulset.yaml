@@ -1,5 +1,6 @@
 ---
 # local-pv.yaml
+# local-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -12,8 +13,17 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
-  hostPath:
+  local:
     path: /mnt/data/postgres
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ip-172-31-36-32
+
 
 ---
 # storageclass.yaml
