@@ -8,5 +8,5 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/data
+    path: /mnt/data  # Make sure this directory exists on your node or modify it
   persistentVolumeReclaimPolicy: Retain

@@ -33,6 +33,7 @@ spec:
           volumeMounts:
             - name: db-vol
               mountPath: /var/lib/postgres/data
+
 ---
 apiVersion: v1
 kind: Service
