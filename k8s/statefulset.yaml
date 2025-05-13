@@ -1,49 +1,47 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres
-  namespace: dev
+  name: postgresql-db
 spec:
-  minReadySeconds: 20
-  replicas: 2
+  serviceName: postgresql-db-service
   selector:
     matchLabels:
-      app: postgres
-  serviceName: postgres-svc
-  volumeClaimTemplates:
-    - metadata:
-        name: db-vol
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: 1Gi
+      app: postgresql-db
+  replicas: 2
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgresql-db
     spec:
       containers:
-        - name: postgres
-          image: postgres:16
-          envFrom:
-            - secretRef:
-                name: mysecret
+        - name: postgresql-db
+          image: postgres:latest
           volumeMounts:
-            - name: db-vol
-              mountPath: /var/lib/postgres/data
-
+            - name: postgresql-db-disk
+              mountPath: /data
+          # Config from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: postgres-db-config
+  # Volume Claim
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-db-disk
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 25Gi
 ---
+# PostgreSQL StatefulSet Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-svc
-  namespace: dev
+name: postgres-db-lb
 spec:
-  clusterIP: None
-  selector:
-    app: postgres
-  ports:
-    - port: 5432
-      targetPort: 5432
+selector:
+app: postgresql-db
+type: LoadBalancer
+ports:
+- port: 5432
+targetPort: 5432
