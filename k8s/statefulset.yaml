@@ -1,4 +1,4 @@
-# 1. StorageClass: No-provisioner
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -6,7 +6,6 @@ metadata:
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 ---
-# 2. PersistentVolume (using hostPath)
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -21,17 +20,15 @@ spec:
   hostPath:
     path: /mnt/data/postgres
 ---
-# 3. Secret for DB Credentials
 apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
 type: Opaque
 data:
-  username: bXl1c2Vy          # base64 for 'myuser'
-  password: cG9zdGdyZXNwYXNz  # base64 for 'postgrespass'
+  username: bXl1c2Vy         
+  password: cG9zdGdyZXNwYXNz 
 ---
-# 4. StatefulSet for PostgreSQL
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -80,7 +77,6 @@ spec:
           requests:
             storage: 5Gi
 ---
-# 5. Headless Service for PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:

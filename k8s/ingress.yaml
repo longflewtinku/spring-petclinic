@@ -16,4 +16,4 @@ spec:
           service:
             name: revest-service
             port:
-              number: 80  # <-- FIXED
+              number: 80

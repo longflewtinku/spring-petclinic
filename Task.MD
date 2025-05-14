@@ -5,12 +5,12 @@
 * Execute Dockerfile Using Command
 ```bash
 # Create image command
-docker image build -t spc:1.0 .
+docker image build -t revestimage:latest .
 docker image build -t <your image:tag> (dockerfile name)
 # Check if the image was created
 docker image ls
 # Check if your image is running in a container (for verification purposes)
-docker container run -P -d --name mytest revestimage:1.0
+docker container run -P -d --name mytest revestimage:latest
 docker container run -P -d --name <container name> <your image:tag>
 # Check if the container is running (to verify container status)
 docker container ls
@@ -32,7 +32,7 @@ trivy image <image:tag>
 ```
 #############################################################################################################################################################################
 * Multiple developers have made changes, so we will scan the Docker image again.
-* On the release branch, scan the Docker image with Trivy.
+* scan the Docker image with Trivy.
 ### After Trivy is installed, use the following command:
 ```bash
 trivy image revestimage:1.0
@@ -45,36 +45,114 @@ trivy image <image:tag>
 ```bash
 docker login
 docker image tag <docke image> <repousename>/<reponame>:<tag>
-docker image tag revestimage:1.0 longflew/javaimagecicd:1.0
-docker image push longflew/javaimagecicd:1.0
+docker image tag revestimage:latest 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
+docker image push 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
 ```
-##### Note: Ensure k8s Cluster(EKS) will be created Below Steps
-### Installing helm 
-* [Refer Here](https://helm.sh/docs/intro/install/) for installing Helm 
-* Once installation completed run the following commands
-* To Create a new helm chart repo
-`helm create <your chat>` 
-`helm create revest-chart`
-* Deploy the application in k8s using helm , the command will be
- `helm install <release name> <chart name>`
- `helm install revest-release revest-chart`
-* Check the appliocation running or not using the k8s commands 
+* Now pull the secret to the k8s 
+
+```bash kubectl create secret docker-registry ecr-creds \
+--docker-server=888577027777.dkr.ecr.ap-south-1.amazonaws.com \
+--docker-username=AWS \
+--docker-password="$(aws ecr get-login-password --region ap-south-1)"
+```
+
+#### Kubernetes Cluster Setup (CRI-Dockerd)
+## Docker & CRI-Dockerd Setup (All Nodes)
+
+```bash 
+   curl -fsSL https://get.docker.com -o install-docker.sh 
+   sh install-docker.sh
+   sudo usermod -aG docker ubuntu
+```
+# Logout & Login again
+
+``` bash
+cd /tmp
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.16/cri-dockerd_0.3.16.3-0.ubuntu-jammy_amd64.deb
+sudo dpkg -i cri-dockerd_0.3.16.3-0.ubuntu-jammy_amd64.deb
+```
+
+###  Install Kubernetes (All Nodes)
+``` bash
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
+```
+* now master means cluster login a root user after execute below the commands 
 ```bash
-kubectl get po
-kubectl get svc
+sudo -i
+kubeadm init --cri-socket "unix:///var/run/cri-dockerd.sock"
 ```
-* Take the IP or DNS of the service and open new Browser and paste the IP or DNS.
-
-### Upgrade docker image in helm
-* Whenever we upgrade the Docker image in Helm, the deployment manifest file is also automatically updated with the new image
-* After making further changes, we updated the values.yaml file to modify the image tag.
-* use the following command:
+* Now i want insall networking purpose Apply CNI Plugin (Weave)
 ```bash
-# docker image upgrade 
-helm upgrade revest-release revest-chart -f values.yaml --set image.tag=new-image-tag
-
-# Verify the Upgrade
-helm get all <release name>
-helm get all revest-release
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 ```
+* Now im using join command on nodes Worker Node Join
+```bash 
+kubeadm join <master-ip>:6443 --token <token> \
+  --discovery-token-ca-cert-hash sha256:<hash> \
+  --cri-socket "unix:///var/run/cri-dockerd.sock"
+ ```
+ * Verify Cluster 
+ ```bash
+kubectl get nodes
+kubectl get all
+``` 
+* Now Deploy Application Manifests
+```bash
+kubectl apply -f k8s/
+kubectl get all
+```
+* Now I'll expose my application to customer traffic that's we need a nginx ingress controller so helm with install nginx controller
+```bash
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx
+```
+## Domain Mapping
+* my domain is being hosted from  cloudflare
+```http://k8s4life.site```
+## Prometheus & Grafana
+* Now install prometheus and grafan with helm 
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
+kubectl port-forward svc/prometheus-grafana 3000:80
+```
+## Java & Jenkins Installation
+* Above all should be done using CI/CD pipeline so i'm installing Jenkins 
+```bash
+sudo apt update 
+sudo apt install openjdk-17-jdk -y
 
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update
+sudo apt install jenkins -y
+```
+* Some follow the steps 
+* Navigate to: http://<node-ip>:8080
+* Configure credentials
+
+* Install required plugins (Docker, Trivy, AWS CLI, GitHub) or already installed in master node or node
+* Install AWS CLI and configure
+```bash 
+sudo apt install awscli -y
+aws configure
+```
+Create a declarative pipeline for your CI/CD project that:
+* Builds Docker image
+* Scans with Trivy
+* Pushes to ECR
+* Deploys to Kubernetes using kubectl 
+
+
+* And one more thing i will check my application manully ( not inclded in pipeline) 
