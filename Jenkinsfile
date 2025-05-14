@@ -9,6 +9,8 @@ pipeline {
     AWS_REGION = "ap-south-1"
   }
 
+
+
   stages {
     stage('Checkout Code') {
       steps {
