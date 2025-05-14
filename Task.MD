@@ -120,6 +120,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx
 ```http://k8s4life.site```
 ## Prometheus & Grafana
 * Now install prometheus and grafan with helm 
+* Temporarily I'm using port-forwarding. we can use ingress manifest for static hosting.
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
