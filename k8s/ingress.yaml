@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: 
+  - host: revest.local
     http:
       paths:
       - path: /
