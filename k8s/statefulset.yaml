@@ -1,4 +1,12 @@
+# 1. StorageClass: No-provisioner
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
 ---
+# 2. PersistentVolume (using hostPath)
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -9,34 +17,21 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: gp2
-  awsElasticBlockStore:
-    volumeID: vol-0f51505272cfb096e  # Replace this with actual EBS volume ID
-    fsType: ext4
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-data-postgres-0
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
   storageClassName: local-storage
+  hostPath:
+    path: /mnt/data/postgres
 ---
-# storageclass.yaml
-# local-storage.yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+# 3. Secret for DB Credentials
+apiVersion: v1
+kind: Secret
 metadata:
-  name: local-storage
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
-
+  name: postgres-secret
+type: Opaque
+data:
+  username: bXl1c2Vy          # base64 for 'myuser'
+  password: cG9zdGdyZXNwYXNz  # base64 for 'postgrespass'
 ---
+# 4. StatefulSet for PostgreSQL
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -62,7 +57,10 @@ spec:
             - name: POSTGRES_DB
               value: mydb
             - name: POSTGRES_USER
-              value: myuser
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -77,11 +75,12 @@ spec:
         name: postgres-data
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        storageClassName: local-storage
         resources:
           requests:
-            storage: 1Gi
-        storageClassName: local-storage    
+            storage: 5Gi
 ---
+# 5. Headless Service for PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:
@@ -93,13 +92,3 @@ spec:
   ports:
     - port: 5432
       name: postgres
----      
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-secret
-type: Opaque
-data:
-  username: bXl1c2Vy          # base64 of 'myuser'
-  password: cG9zdGdyZXNwYXNz  # base64 of 'postgrespass'
-
