@@ -27,7 +27,7 @@ sudo apt-get install trivy -y
 ```
 ### After Trivy is installed, scan your image using the following command:
 ```bash
-trivy image revestimage:1.0
+trivy image revestimage:latest
 trivy image <image:tag>
 ```
 #############################################################################################################################################################################
@@ -41,7 +41,7 @@ trivy image <image:tag>
 * The output will show vulnerabilities or reports.
 * Pushing the Image to a Registry
 * Once the image scan is completed, we can push the image to a registry such as Docker Hub, ECR
-### To push to Docker Hub, follow these steps:
+### To push to ECR, follow these steps:
 ```bash
 docker login
 docker image tag <docke image> <repousename>/<reponame>:<tag>
