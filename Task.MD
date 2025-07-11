@@ -5,12 +5,12 @@
 * Execute Dockerfile Using Command
 ```bash
 # Create image command
-docker image build -t revestimage:latest .
+docker image build -t spctimage:latest .
 docker image build -t <your image:tag> (dockerfile name)
 # Check if the image was created
 docker image ls
 # Check if your image is running in a container (for verification purposes)
-docker container run -P -d --name mytest revestimage:latest
+docker container run -P -d --name mytest spctimage:latest
 docker container run -P -d --name <container name> <your image:tag>
 # Check if the container is running (to verify container status)
 docker container ls
@@ -27,7 +27,7 @@ sudo apt-get install trivy -y
 ```
 ### After Trivy is installed, scan your image using the following command:
 ```bash
-trivy image revestimage:latest
+trivy image spcimage:latest
 trivy image <image:tag>
 ```
 #############################################################################################################################################################################
@@ -35,7 +35,7 @@ trivy image <image:tag>
 * scan the Docker image with Trivy.
 ### After Trivy is installed, use the following command:
 ```bash
-trivy image revestimage:1.0
+trivy image spcimage:1.0
 trivy image <image:tag>
 ```
 * The output will show vulnerabilities or reports.
@@ -45,8 +45,8 @@ trivy image <image:tag>
 ```bash
 docker login
 docker image tag <docke image> <repousename>/<reponame>:<tag>
-docker image tag revestimage:latest 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
-docker image push 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/revest:latest
+docker image tag revestimage:latest 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/spc:latest
+docker image push 888577027777.dkr.ecr.ap-south-1.amazonaws.com/dev/spc:latest
 ```
 * Now pull the secret to the k8s 
 
