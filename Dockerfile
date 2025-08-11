@@ -3,7 +3,7 @@ RUN git clone https://github.com/longflewtinku/spring-petclinic.git && \
     cd spring-petclinic && \
     mvn package 
 
-FROM amazoncorretto:17 AS runtime
+FROM eclipse-temurin:17.0.16_8-jre-ubi9-minimal AS runtime
 RUN adduser -m -d  /usr/share/demo -s /bin/bash testuser
 USER testuser
 WORKDIR /usr/share/demo
