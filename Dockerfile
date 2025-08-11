@@ -4,7 +4,7 @@ RUN git clone https://github.com/longflewtinku/spring-petclinic.git && \
     mvn package 
 
 FROM amazoncorretto:17 AS runtime
-RUN adduser -D -h /usr/share/demo -s /bin/bash testuser
+RUN adduser -m -d  /usr/share/demo -s /bin/bash testuser
 USER testuser
 WORKDIR /usr/share/demo
 COPY --from=build /target/*.jar laxmikanth.jar
