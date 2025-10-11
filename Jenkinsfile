@@ -2,7 +2,9 @@ pipeline {
     agent {
         label 'JDKJAVASPC'  // Ensure this label corresponds to your Jenkins node
     }
-
+    triggers {
+        pollSCM('* * * * *')
+    }
     stages {
         stage('GIT CHECKOUT') {
             steps {
