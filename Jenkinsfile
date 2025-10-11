@@ -1,59 +1,64 @@
 pipeline {
-  agent {
-    label 'JDKJAVASPC'
-
-  }   
-  stages {
-    stage('GIT CHECKOUT') {
-      steps {
-        git url: 'https://github.com/longflewtinku/spring-petclinic.git',
-        branch: 'main'
-      }
+    agent {
+        label 'JDKJAVASPC'  // Ensure this label corresponds to your Jenkins node
     }
-    stage('build and scan') {
-      steps {
-        withCredentials([string(credentialsId: 'sonar_id', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('SONARQUBE') {
+
+    stages {
+        stage('GIT CHECKOUT') {
+            steps {
+                git url: 'https://github.com/longflewtinku/spring-petclinic.git', branch: 'main'
+            }
+        }
+
+        stage('Build and SonarQube Scan') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar_id', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('SONARQUBE') {  // Ensure 'SONARQUBE' is configured in Jenkins
                         sh '''
-                            mvn package sonar:sonar \
+                            mvn clean package sonar:sonar \
                             -Dsonar.projectKey=longflewtinku_spring-petclinic \
                             -Dsonar.organization=jenkinsjava \
                             -Dsonar.host.url=https://sonarcloud.io \
                             -Dsonar.login=$SONAR_TOKEN
                         '''
-               }
+                    }
+                }
             }
-         }
-      }
-      stage('upload jfrog') {
-        steps {
-          rtupload (
-            serverId: 'JFROG_SPC_JAVA',
-            spec: ''' {
-               "files": [
-                  {
-                    "pattern": "target/*.jar",
-                    "target": "jfrogjavaspc-libs-release/"
-                  }
-                ]
-            } ''',
-          )
-          rtPublishBuildInfo (
-            serverId: 'JFROG_SPC_JAVA'
-          )
         }
-      }
-post {
-        always {
-            archiveArtifacts artifacts: '**/target/*.jar'
-            junit '**/target/surefire-reports/*.xml' 
-        }
-        success {
-            echo 'this pipeline good'
-        }
-        failure {
-            echo 'this is waste pipeline'
+
+        stage('Upload to JFrog Artifactory') {
+            steps {
+                rtupload(
+                    serverId: 'JFROG_SPC_JAVA',  // Ensure the JFrog credentials are correct
+                    spec: ''' 
+                    {
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "jfrogjavaspc-libs-release-local/"
+                            }
+                        ]
+                    }
+                    '''
+                )
+                rtPublishBuildInfo(serverId: 'JFROG_SPC_JAVA')  // Publish build info to JFrog Artifactory
+            }
         }
     }
-  }
+
+    post {
+        always {
+            // Archive the JAR files and test reports regardless of the pipeline result
+            archiveArtifacts artifacts: '**/target/*.jar'
+            junit '**/target/surefire-reports/*.xml'
+        }
+
+        success {
+            echo 'Pipeline executed successfully.'
+        }
+
+        failure {
+            echo 'Pipeline failed. Please check the logs for errors.'
+        }
+    }
 }
