@@ -1,4 +1,4 @@
-# Steps
+<!-- # Steps
 
 * Java-based Spring Petclinic application
 * Create a multi-stage Dockerfile for the Spring Petclinic application on the `main`    branch
@@ -156,4 +156,4 @@ Create a declarative pipeline for your CI/CD project that:
 * Deploys to Kubernetes using kubectl 
 
 
-* And one more thing i will check my application manully ( not inclded in pipeline) 
+* And one more thing i will check my application manully ( not inclded in pipeline)  -->

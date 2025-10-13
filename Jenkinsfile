@@ -46,6 +46,12 @@ pipeline {
                 rtPublishBuildInfo(serverId: 'JFROG_SPC_JAVA')  // Publish build info to JFrog Artifactory
             }
         }
+        stage('Docker image build') {
+            steps {
+                sh 'docker image build -t java:1.0 .'
+                sh ' docker image ls'
+            }
+        }
     }
 
     post {
