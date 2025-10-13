@@ -12,21 +12,21 @@ pipeline {
             }
         }
 
-        stage('Build and SonarQube Scan') {
-            steps {
-                withCredentials([string(credentialsId: 'sonar_id', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('SONARQUBE') {  // Ensure 'SONARQUBE' is configured in Jenkins
-                        sh '''
-                            mvn clean package sonar:sonar \
-                            -Dsonar.projectKey=longflewtinku_spring-petclinic \
-                            -Dsonar.organization=jenkinsjava \
-                            -Dsonar.host.url=https://api.sonarcloud.io \
-                            -Dsonar.login=$SONAR_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('Build and SonarQube Scan') {
+        //     steps {
+        //         withCredentials([string(credentialsId: 'sonar_id', variable: 'SONAR_TOKEN')]) {
+        //             withSonarQubeEnv('SONARQUBE') {  // Ensure 'SONARQUBE' is configured in Jenkins
+        //                 sh '''
+        //                     mvn clean package sonar:sonar \
+        //                     -Dsonar.projectKey=longflewtinku_spring-petclinic \
+        //                     -Dsonar.organization=jenkinsjava \
+        //                     -Dsonar.host.url=https://api.sonarcloud.io \
+        //                     -Dsonar.login=$SONAR_TOKEN
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage('Upload to JFrog Artifactory') {
         //     steps {
