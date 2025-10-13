@@ -20,7 +20,7 @@ pipeline {
                             mvn clean package sonar:sonar \
                             -Dsonar.projectKey=longflewtinku_spring-petclinic \
                             -Dsonar.organization=jenkinsjava \
-                            -Dsonar.host.url=https://sonarcloud.io \
+                            -Dsonar.host.url=https://api.sonarcloud.io \
                             -Dsonar.login=$SONAR_TOKEN
                         '''
                     }
