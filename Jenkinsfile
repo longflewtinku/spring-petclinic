@@ -28,24 +28,24 @@ pipeline {
             }
         }
 
-        stage('Upload to JFrog Artifactory') {
-            steps {
-                rtupload(
-                    serverId: 'JFROG_SPC_JAVA',  // Ensure the JFrog credentials are correct
-                    spec: ''' 
-                    {
-                        "files": [
-                            {
-                                "pattern": "target/*.jar",
-                                "target": "jfrogjavaspc-libs-release-local/"
-                            }
-                        ]
-                    }
-                    '''
-                )
-                rtPublishBuildInfo(serverId: 'JFROG_SPC_JAVA')  // Publish build info to JFrog Artifactory
-            }
-        }
+        // stage('Upload to JFrog Artifactory') {
+        //     steps {
+        //         rtupload(
+        //             serverId: 'JFROG_SPC_JAVA',  // Ensure the JFrog credentials are correct
+        //             spec: ''' 
+        //             {
+        //                 "files": [
+        //                     {
+        //                         "pattern": "target/*.jar",
+        //                         "target": "jfrogjavaspc-libs-release-local/"
+        //                     }
+        //                 ]
+        //             }
+        //             '''
+        //         )
+        //         rtPublishBuildInfo(serverId: 'JFROG_SPC_JAVA')  // Publish build info to JFrog Artifactory
+        //     }
+        // }
         stage('Docker image build') {
             steps {
                 sh 'docker image build -t java:1.0 .'
