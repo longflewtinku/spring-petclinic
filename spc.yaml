@@ -1,0 +1,40 @@
+parameters:
+
+  - name: mavengoal
+    type: string 
+    default: 'package'
+    values:
+        - package 
+        - clean install
+        - test
+        - verify 
+  - name: javaversion
+    type: string
+    values: 
+        - '1.17'
+        - '1.25'  
+  - name: artifacts
+    type: string
+    default: 'drop' 
+    values: 
+      - laxmikanth
+      - devops      
+steps:
+  - task: Maven@4
+    displayName: 'Maven Build'
+    inputs:
+        mavenPOMFile: 'pom.xml'
+        goals: '${{ parameters.mavengoal }}'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml' 
+    
+  - task: CopyFiles@2
+    displayName: 'Copy Files to Artifact Staging Directory'
+    inputs:
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - publish: '$(Build.ArtifactStagingDirectory)'
+    displayName: 'Publish Artifacts'
+    artifact: ${{ parameters.artifacts }}
+          
