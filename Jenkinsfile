@@ -31,7 +31,7 @@ pipeline {
                 "files": [
                     {
                     "pattern": "target/*.jar",
-                    "target": "spcjava-spc"
+                    "target": "spcjava-spc/"
                     }
                 ]
                 }'''
