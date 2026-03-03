@@ -1,9 +1,5 @@
 pipeline {
     agent {label 'SPC'}
-    triggers {
-        pollSCM('* * * * *')
-
-    }
     parameters {
         choice(name: 'goals', choices: ['package', 'clean install', 'verify'], description: 'Pick something')
     }
