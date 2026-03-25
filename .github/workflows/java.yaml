@@ -14,7 +14,11 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Build Java with Maven
-        run: mvn package  
-      - name: my sonar scan
+      # - name: Build Java with Maven
+      #   run: mvn package  
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
                  
