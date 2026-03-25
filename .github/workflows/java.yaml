@@ -8,11 +8,13 @@ on:
 jobs:
   build:
     name: my-spc
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
 
       - name: Build Java with Maven
-        run: mvn package        
+        run: mvn package  
+      - name: my sonar scan
+                 
