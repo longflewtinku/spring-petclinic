@@ -9,6 +9,8 @@ pipeline {
         tag_name = '1.0'
     }
 
+
+
     stages {
 
         stage('git checkout') {
