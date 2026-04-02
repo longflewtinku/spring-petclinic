@@ -93,7 +93,7 @@ pipeline {
     stages {
         stage ('git checkout') {
             steps {
-            git url: '',
+            git url: 'https://github.com/longflewtinku/spring-petclinic.git',
             branch: 'main'
             }   
         }
