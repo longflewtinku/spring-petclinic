@@ -85,23 +85,25 @@
 
 
 
-@Library ('my-repo-sharedLibrary')
+@Library('my-shared-lib') _
+
 pipeline {
     agent {
         label 'SPC'
     }
+
     stages {
-        stage ('git checkout') {
+        stage('Git Checkout') {
             steps {
-            git url: 'https://github.com/longflewtinku/spring-petclinic.git',
-            branch: 'main'
-            }   
+                git url: 'https://github.com/longflewtinku/spring-petclinic.git',
+                    branch: 'main'
+            }
         }
-   
-       stage('build') {
-        steps {
-            build()
+
+        stage('Build') {
+            steps {
+                build()   // comes from vars/build.groovy
+            }
         }
-       }
     }
 }
