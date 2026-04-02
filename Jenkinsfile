@@ -85,7 +85,7 @@
 
 
 
-@Library 'my-repo-sharedLibrary'
+@Library ('my-repo-sharedLibrary')
 pipeline {
     agent {
         label: 'SPC'
