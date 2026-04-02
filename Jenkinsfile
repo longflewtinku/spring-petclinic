@@ -88,7 +88,7 @@
 @Library ('my-repo-sharedLibrary')
 pipeline {
     agent {
-        label: 'SPC'
+        label 'SPC'
     }
     stages {
         stage ('git checkout') {
