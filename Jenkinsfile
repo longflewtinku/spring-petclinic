@@ -10,9 +10,11 @@ pipeline {
                 branch: "main"
             }
         }
-        stage('build') {
-            steps {
-                sh "mvn package"
+        stage('scan') {
+            steps  {
+              withSonarQubeEnv('SONAR') {
+                sh "mvn package sonar:sonar"
+              } 
             }
         }
     }
