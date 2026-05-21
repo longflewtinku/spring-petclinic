@@ -12,12 +12,19 @@ pipeline {
         }
         stage('scan') {
             steps  {
+             withCredentials([string(credentialsId: 'soanr_id', variable: 'SONAR_TOKEN')]) {   
               withSonarQubeEnv('SONAR') {
-                sh "mvn package sonar:sonar"
-              } 
+                sh """mvn clean verify sonar:sonar \
+                      -Dsonar.projectKey=longflewtinku_spring-petclinic \
+                      -Dsonar.organization=longflewtinku \
+                      -Dsonar.host.url=https://sonarcloud.io/ \
+                      -Dsonar.login=$SONAR_TOKEN""" 
+                    
+                } 
             }
         }
     }
+  }
 }
 
 
