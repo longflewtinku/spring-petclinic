@@ -18,7 +18,7 @@ pipeline {
                       -Dsonar.projectKey=longflewtinku_spring-petclinic \
                       -Dsonar.organization=longflewtinku \
                       -Dsonar.host.url=https://sonarcloud.io/ \
-                      -Dsonar.login=$SONAR""" 
+                      -Dsonar.login=5be0231a384541e11dc1faebc8f0d50b67c75742""" 
                     
                 } 
             }
