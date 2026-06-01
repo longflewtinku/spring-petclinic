@@ -24,6 +24,23 @@ pipeline {
             }
         }
     }
+        stage('upload binaryfile') {
+            step {
+                rtUpload (
+                    serverId: 'JFROG_ID',
+                    spec: '''{
+                       "files": [
+                       {
+                         "pattern": "target/*.jar",
+                         "target": "javaspc/"
+                       } 
+                       ]
+                    }'''
+
+                )
+                rtPublishBuildInfo(serverId: 'JFROG_ID')
+            }
+        }
   }
 }
 
