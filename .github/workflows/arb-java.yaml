@@ -1,0 +1,19 @@
+name: Java based workflow
+
+on: 
+  push:
+    branches:
+      - main 
+
+jobs:
+  build: 
+    runs-on: self-hosted
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v7
+      - name: java version
+        run: java --version
+      - name: maven version 
+        run: mvn --version 
+      - name: build package 
+        run: mvn package        
