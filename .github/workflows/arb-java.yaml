@@ -15,5 +15,12 @@ jobs:
         run: java --version
       - name: maven version 
         run: mvn --version 
-      - name: build package 
-        run: mvn package        
+      - name: build package and scan
+        env: 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsoanr.organization=longflewtinku  \
+            -Dsonar.projectKey=longflewtinku_spring-petclinic \
+            -Dsonar.host.url=https://sonarcloud.io/   
