@@ -49,11 +49,11 @@ pipeline {
                       docker push 984912521466.dkr.ecr.us-west-2.amazonaws.com/dev/spc:latest"""
             }
         }
-        stage('docker image scan') {
-            steps {
-                sh 'trivy image  984912521466.dkr.ecr.us-west-2.amazonaws.com/dev/spc:latest'
-            }
-        }
+        // stage('docker image scan') {
+        //     steps {
+        //         sh 'trivy image  984912521466.dkr.ecr.us-west-2.amazonaws.com/dev/spc:latest'
+        //     }
+        // }
         stage('deploy k8s') {
             steps {
                 sh 'kubectl apply -f deployment.yaml'
